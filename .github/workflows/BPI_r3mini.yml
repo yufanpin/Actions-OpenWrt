@@ -46,14 +46,6 @@ on:
         - v7.6.6.1-fw-20230421
         - v7.6.6.1-fw-20231024
         - v7.6.6.1-fw-20240823
-      SW_DRIVER:
-        description: 'Choose Switch Driver'
-        required: true
-        default: 'GSW'
-        type: choice
-        options:
-        - GSW
-        - DSA
       APP_MTK:
         description: 'Use luci-app-mtk wifi config'
         required: true
