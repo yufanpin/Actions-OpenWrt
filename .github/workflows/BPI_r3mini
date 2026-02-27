@@ -33,7 +33,7 @@ on:
         type: choice
         options:
         - v7.6.7.2-fw-20240823(recommend)
-        - v7.6.6.1-fw-20230808(recommend)
+        - v7.6.6.1-fw-20230808(recommend)(提取自tp)
         - v7.6.7.2-fw-default
         - v7.6.7.2-fw-20221208
         - v7.6.7.2-fw-20230306
@@ -75,13 +75,13 @@ env:
   ###############手动修改##############
   ##手动设置上传时候的打包名称和tag名称UPLOAD_TAG_NAME
   OPENWRT_NAME: hanwckf
-  UPLOAD_TAG_NAME: jdcloud_re-cp-03
+  UPLOAD_TAG_NAME: BPI-R3MINI-NAND
   REPO_URL: https://github.com/lgs2007m/immortalwrt-mt798x
   REPO_BRANCH: ${{ github.event.inputs.REPO_BRANCH || 'v7672' }}
-  FEEDS_CONF: JDCloud-AX6000-Baili-hanwckf/feeds.conf.default
-  CONFIG_FILE: JDCloud-AX6000-Baili-hanwckf/.mtwifi-cfg.config
-  DIY_P1_SH: JDCloud-AX6000-Baili-hanwckf/diy-part1.sh
-  DIY_P2_SH: JDCloud-AX6000-Baili-hanwckf/diy-part2.sh
+  FEEDS_CONF: BPI/feeds.conf.default
+  CONFIG_FILE: BPI/.mtwifi-cfg.config
+  DIY_P1_SH: BPI/diy-part1.sh
+  DIY_P2_SH: BPI/diy-part2.sh
   SSH_ACTIONS: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
