@@ -22,6 +22,16 @@ on:
         options:
         - v7672
         - v7661
+      # --- 新增存储介质选择 ---
+      FLASH_TYPE:
+        description: '选择存储介质 (NAND 或 EMMC)'
+        required: true
+        default: 'NAND'
+        type: choice
+        options:
+        - NAND
+        - EMMC
+      # ----------------------
       LAN_IP:
         description: 'Set LAN IP Address'
         required: true
@@ -60,14 +70,11 @@ on:
         description: 'SSH connection to Actions'
         required: false
         default: 'false'
-#  schedule:
-#    - cron: 0 16 * * *
 
 env:
-  ###############手动修改##############
-  ##手动设置上传时候的打包名称和tag名称UPLOAD_TAG_NAME
   OPENWRT_NAME: hanwckf
-  UPLOAD_TAG_NAME: BPI-R3MINI-NAND
+  # 将 UPLOAD_TAG_NAME 改为动态获取用户输入
+  UPLOAD_TAG_NAME: BPI-R3MINI-${{ github.event.inputs.FLASH_TYPE || 'NAND' }}
   REPO_URL: https://github.com/lgs2007m/immortalwrt-mt798x
   REPO_BRANCH: ${{ github.event.inputs.REPO_BRANCH || 'v7672' }}
   FEEDS_CONF: BPI/feeds.conf.default
@@ -107,12 +114,7 @@ jobs:
     - name: 清理磁盘空间(Ubuntu)
       uses: jlumbroso/free-disk-space@main
       with:
-        # this might remove tools that are actually needed,
-        # when set to "true" but frees about 6 GB
         tool-cache: true
-        
-        # all of these default to true, but feel free to set to
-        # "false" if necessary for your workflow
         android: false
         dotnet: false
         haskell: false
@@ -146,14 +148,32 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
+    # --- 新增步骤：根据输入切换 NAND 或 EMMC ---
+    - name: 切换设备存储介质 (NAND/EMMC)
+      run: |
+        cd openwrt
+        FTYPE="${{ github.event.inputs.FLASH_TYPE }}"
+        echo "正在配置为: BPI-R3MINI-$FTYPE"
+        
+        # 删除所有 R3MINI 设备定义
+        sed -i '/CONFIG_TARGET_mediatek_mt7986_DEVICE_BPI-R3MINI/d' .config
+        
+        # 写入新定义的设备型号
+        echo "CONFIG_TARGET_mediatek_mt7986_DEVICE_BPI-R3MINI-${FTYPE}=y" >> .config
+        
+        # 如果是 EMMC，确保 eMMC 相关工具被选中
+        if [ "$FTYPE" = "EMMC" ]; then
+          echo "CONFIG_PACKAGE_mmc-utils=y" >> .config
+          echo "CONFIG_PACKAGE_lsblk=y" >> .config
+          echo "CONFIG_PACKAGE_kmod-fs-ext4=y" >> .config
+        fi
+
     - name: 设置LAN IP地址（路由器登录地址）
       run: |
         cd openwrt
         SET_IP=${{ github.event.inputs.LAN_IP }}
         if [[ $SET_IP =~ ^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$ ]]; then
-            #修改immortalwrt.lan关联IP
             sed -i "s/192\.168\.[0-9]*\.[0-9]*/$SET_IP/g" $(find feeds/luci/modules/luci-mod-system -type f -name "flash.js")
-            #修改默认IP地址
             sed -i "s/192\.168\.[0-9]*\.[0-9]*/$SET_IP/g" package/base-files/files/bin/config_generate
             echo "Set LAN IP Address: $SET_IP"
         else
@@ -170,8 +190,6 @@ jobs:
         sed -i "s/^\(CONFIG_MTK_MT_WIFI_DRIVER_VERSION_\)[0-9]\{4\}/\1${version_num}/g" .config
         [ "$firmware" == "default" ] && firmware="DEFAULT_FIRMWARE"
         sed -i "s/^\(CONFIG_MTK_MT_WIFI_MT798[168]\)_[0-9]\{8\}=y/\1_${firmware}=y/g" .config
-
-
 
     - name: 使用luci-app-mtk无线配置
       if: github.event.inputs.APP_MTK == 'true'
@@ -280,6 +298,7 @@ jobs:
         touch release.txt
         echo "- 使用源码：${{ env.REPO_URL }}" >> release.txt
         echo "- 使用分支：${{ env.REPO_BRANCH }}" >> release.txt
+        echo "- 存储介质：${{ github.event.inputs.FLASH_TYPE }}" >> release.txt
         echo "- 登录地址：${{ env.IP_ADDR }}" >> release.txt
         echo "- 使用WiFi驱动: mt_wifi${{ env.WIFI_VERSION }}-fw${{ env.MT_WIFI_FW }}" >> release.txt
         if [[ "${{ env.SWITCH }}" == '-gsw' ]]; then
