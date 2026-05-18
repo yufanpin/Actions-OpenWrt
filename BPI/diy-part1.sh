@@ -21,3 +21,5 @@ git clone https://github.com/lgs2007m/luci-app-easytier package/easytier
 git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
 git clone https://github.com/lwb1978/openwrt-gecoosac package/openwrt-gecoosac
 git clone https://github.com/FUjr/QModem package/QModem
+git clone https://github.com/eamonxg/luci-theme-aurora.git package/luci-theme-aurora
+git clone https://github.com/eamonxg/luci-app-aurora-config.git package/luci-app-aurora-config
