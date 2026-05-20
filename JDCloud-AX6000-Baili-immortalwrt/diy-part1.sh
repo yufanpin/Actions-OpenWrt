@@ -19,3 +19,5 @@
 #git clone https://github.com/messense/aliyundrive-webdav package/messense
 git clone https://github.com/gdy666/luci-app-lucky package/lucky
 git clone https://github.com/destan19/OpenAppFilter package/OpenAppFilter
+git clone https://github.com/eamonxg/luci-theme-aurora.git package/luci-theme-aurora
+git clone https://github.com/eamonxg/luci-app-aurora-config.git package/luci-app-aurora-config
