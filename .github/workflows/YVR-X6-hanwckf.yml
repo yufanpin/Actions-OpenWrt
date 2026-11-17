@@ -141,6 +141,10 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
+    - name: 安装 Design 主题包并设为默认
+      run: |
+        bash "$GITHUB_WORKSPACE/luci theme design/setup-theme.sh"
+
     - name: 设置LAN IP地址（路由器登录地址）
       run: |
         cd openwrt

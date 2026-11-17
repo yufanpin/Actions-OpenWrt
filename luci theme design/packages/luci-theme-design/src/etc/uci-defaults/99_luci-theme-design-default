@@ -1,0 +1,12 @@
+#!/bin/sh
+# Force the Design theme as the default LuCI theme.
+# The 99_ prefix makes this run after every other theme's uci-defaults script,
+# so Design always wins regardless of which themes are compiled in.
+uci -q batch <<-EOF
+	set luci.themes.Design=/luci-static/design
+	set luci.main.mediaurlbase=/luci-static/design
+	set luci.core.mediaurlbase=/luci-static/design
+	commit luci
+EOF
+rm -f /tmp/luci-indexcache
+exit 0

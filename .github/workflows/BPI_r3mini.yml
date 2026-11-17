@@ -148,6 +148,10 @@ jobs:
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P2_SH
 
+    - name: 安装 Design 主题包并设为默认
+      run: |
+        bash "$GITHUB_WORKSPACE/luci theme design/setup-theme.sh"
+
     # --- 新增步骤：根据输入切换 NAND 或 EMMC ---
     - name: 切换设备存储介质 (NAND/EMMC)
       run: |
